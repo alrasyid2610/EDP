@@ -4998,6 +4998,16 @@ function init_echarts() {
 
 }
 
+// untuk konfirmasi delete data
+function confirmDelete() {
+    $("#cpa-form").submit(function(e){
+        e.preventDefault();
+    });
+}
+
+$(document).ready(function () {
+    
+})
 
 $(document).ready(function () {
 
