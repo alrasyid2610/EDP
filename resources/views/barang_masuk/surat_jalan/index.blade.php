@@ -1,6 +1,7 @@
 @extends('layouts.main')
 @section('content')
 
+
 {{-- {{ $data) }} --}}
 
 <div class="row d-block">

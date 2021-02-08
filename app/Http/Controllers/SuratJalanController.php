@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SuratJalan;
 use Illuminate\Http\Request;
+use App\Http\Requests\SuratJalanStoreRequest;
 
 class SuratJalanController extends Controller
 {
@@ -23,9 +24,18 @@ class SuratJalanController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create(Request $request)
+    {   
+        // $request->session()->flush();
+        // $request->session()->put('harun','safsafsaf');
         return view('barang_masuk.surat_jalan.create', ['page_action' => 'Input', 'page_name' => 'Surat Jalan']);
+    }
+
+    public function create2(Request $request)
+    {   
+        // $request->session()->flush();
+        // $request->session()->put('harun','safsafsaf');
+        return view('barang_masuk.surat_jalan.create', ['page_action' => 'darr', 'page_name' => 'Surat Jalan']);
     }
 
     /**
@@ -34,18 +44,39 @@ class SuratJalanController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(SuratJalanStoreRequest $request)
     {
+        // $validator = $request->validated();
         SuratJalan::create([
-            'no_po' => request('no_po'),
-            'penerima' => request('penerima'),
-            'tgl_terima' => request('tgl_terima'),
-            'supplier' => request('supplier'),
-            'tujuan' => request('tujuan')
+            'no_po' => $request->no_po,
+            'penerima' => $request->penerima,
+            'tgl_terima' => $request->tgl_terima,
+            'supplier' => $request->supplier,
+            'tujuan' => $request->tujuan
         ]);
 
-        return redirect()->back();
+        return redirect()->back()->withErrors($request, 'login')->withInput();
     }
+
+
+    // public function store2(Request $request)
+    // {
+
+    //     $request->validate([
+    //         'no_po' => 'required|min:7',
+    //         'penerima' => 'required|min:5',
+    //     ]);
+        
+    //     SuratJalan::create([
+    //         'no_po' => request('no_po'),
+    //         'penerima' => request('penerima'),
+    //         'tgl_terima' => request('tgl_terima'),
+    //         'supplier' => request('supplier'),
+    //         'tujuan' => request('tujuan')
+    //     ]);
+
+    //     return redirect()->back()->with('success', 'Data created successfully.');
+    // }
 
     /**
      * Display the specified resource.

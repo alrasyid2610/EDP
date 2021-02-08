@@ -1,5 +1,8 @@
 @extends('layouts.main')
 @section('content')
+
+
+
 <div class="row">
 	<div class="title_left col-md-12">
     <h3>Barang Masuk <small> | <a href="{{ url('/barang_masuk/surat_jalan/create') }}" class="text-primary">Input Surat Jalan</a> | 
@@ -47,52 +50,75 @@
 					<textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
 				</div>
 			</form> --}}
-			
-
 			<form method="POST" action=" {{ route('surat_jalan.store') }} ">
 				@csrf
 				<div class="form-row mb-4">
 					<div class="col-12">
 						<h5 class="m-0 mb-2 font-italic font-weight-bold">Data Surat Jalan</h5>
+						@if(Session::has('success'))
+							<div class="alert alert-success">
+									{{ Session::get('success') }}
+									@php
+											Session::forget('success');
+									@endphp
+							</div>
+						@endif
 					</div>
 					<div class="col-md-12 mb-3">
-						<label for="no_po ">No PO</label>
-						<input type="text" class="form-control" id="no_po" placeholder="No Delevery Orders" name="no_po" required="">
+						<label for="no_po">No Po</label>
+						<input type="text" class="form-control" id="no_po" placeholder="No Po" name="no_po" required="" value="{{ old('no_po') ?? '' }}">
+						@if ($errors->has('no_po'))
+							<span class="text-danger">{{ $errors->first('no_po') }}</span>
+						@endif
+
 					</div>
 
 					<div class="col-md-12 mb-3">
 						<label for="penerima">Penerima Barang</label>
-						<input type="text" class="form-control" id="penerima" placeholder="penerima" name="penerima" required="">
+						<input type="text" class="form-control" id="penerima" placeholder="penerima" name="penerima" required="" value="{{ old('penerima') ?? '' }}">
+						@if ($errors->login->has('penerima'))
+							<span class="text-danger">{{ $errors->login->first('penerima') }}</span>
+						@endif
 					</div>
 
 					<div class="col-md-12 mb-3">
 						<label for="supplier">supplier</label>
-						<select class="custom-select" name="supplier">
-							<option selected>-- Choose --</option>
+						<select class="custom-select" name="supplier" required>
+							<option selected value="">-- Choose --</option>
 							<option value="CV. JODA JAYA ELECTRIC">CV. JODA JAYA ELECTRIC</option>
 						</select>
+						@if ($errors->login->has('supplier'))
+							<span class="text-danger">{{ $errors->login->first('supplier') }}</span>
+						@endif
 					</div>
 
 					<div class="col-md-12 mb-3">
 						<label for="tgl_terima">Tanggal terima barang</label>
-						<input type="date" class="form-control" id="tgl_terima" placeholder="Tanggal Terima Barang" name="tgl_terima" required="">
+						<input type="date" class="form-control" id="tgl_terima" placeholder="Tanggal Terima Barang" name="tgl_terima" value="">
 					</div>
 
 					<div class="col-md-12 mb-3">
 						<label for="tujuan">Tujuan</label>
-						<select class="custom-select" name="tujuan">
-							<option selected>-- Choose --</option>
+						<select class="custom-select" name="tujuan" required>
+							<option selected value="">-- Choose --</option>
 							<option value="DNPI Pulogadung">DNPI Pulogadung</option>
 							<option value="DNPI Krawang">DNPI Krawang</option>
 						</select>
+						@if ($errors->login->has('tujuan'))
+							<span class="text-danger">{{ $errors->login->first('tujuan') }}</span>
+						@endif
 					</div>
 				</div>
 					<button type="submit" class="btn btn-primary" name="submit">Submit</button>
 			</form>
 		</div>
-		
+
+
 
 		
 	</div>
 </div>
+@php
+dd(session()->all());
+@endphp		
 @endsection
