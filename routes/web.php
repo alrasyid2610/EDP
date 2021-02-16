@@ -13,11 +13,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-use App\Http\Controllers\SuratJalanController; // Surat Jalan Class
-use App\Http\Controllers\BonTeknikController; // Bon teknik Class
+use App\Http\Controllers\ShippingDocumentController; // Surat Jalan Class
+use App\Http\Controllers\TechnicalDocumentController; // Bon teknik Class
+use App\Http\Controllers\ComputersController; // Computers Class
+use App\Http\Controllers\ProductController;
 
+Route::resource('/barang_masuk/shipping_documents', ShippingDocumentController::class);
+Route::resource('/barang_masuk/bon_teknik', TechnicalDocumentController::class);
+Route::get('/barang_masuk/bon_teknik/create/{id_surat_jalan}', function() {
+    
+})->where('id_surat_jalan', '^[0-9]*$')->middleware('cekIdSuratJalan');
+Route::resource('/computers', ComputersController::class);
 
-Route::resource('/barang_masuk/surat_jalan', SuratJalanController::class);
-Route::resource('/barang_masuk/bon_teknik', BonTeknikController::class);
-
+Route::resource('products', ProductController::class);
 

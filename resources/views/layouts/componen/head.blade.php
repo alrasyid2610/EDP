@@ -17,11 +17,15 @@
 <link href=" {{ asset('/admin/vendors/iCheck/skins/flat/green.css') }} " rel="stylesheet">
 
 <!-- bootstrap-progressbar -->
-<link href=" {{ asset('/admin/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css') }} " rel="stylesheet">
+<link href=" {{ asset('/admin/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css') }} "
+  rel="stylesheet">
 <!-- JQVMap -->
-<link href=" {{ asset('/admin/vendors/jqvmap/dist/jqvmap.min.css"') }}  rel="stylesheet"/>
+<link href=" {{ asset('/admin/vendors/jqvmap/dist/jqvmap.min.css"') }}  rel=" stylesheet" />
 <!-- bootstrap-daterangepicker -->
 <link href=" {{ asset('/admin/vendors/bootstrap-daterangepicker/daterangepicker.css') }} " rel="stylesheet">
+<link href=" {{ asset('/admin/vendors/jQuery-Smart-Wizard/dist/css/smart_wizard_all.css') }} " rel="stylesheet">
+
+
 
 <!-- Custom Theme Style -->
 <link href=" {{ asset('/admin/build/css/custom.css') }} " rel="stylesheet">

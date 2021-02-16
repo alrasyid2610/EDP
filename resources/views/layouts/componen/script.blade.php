@@ -36,5 +36,8 @@
 <script src=" {{ asset('/admin/vendors/moment/min/moment.min.js') }} "></script>
 <script src=" {{ asset('/admin/vendors/bootstrap-daterangepicker/daterangepicker.js') }} "></script>
 
+<script src=" {{ asset("/admin/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js") }}"></script>
+
 <!-- Custom Theme Scripts -->
 <script src=" {{ asset('/admin/build/js/custom.js') }} "></script>
+<script src=" {{ asset('/admin/build/js/custom2.js') }} "></script>

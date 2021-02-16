@@ -43,7 +43,7 @@
 							</li>
 							<li><a>Bon Teknik<span class="fa fa-chevron-down"></span></a>
 								<ul class="nav child_menu">
-									<li class="sub_menu"><a href=" {{ url('/barang_masuk/bon_teknik/create') }} ">Input Bon Teknik</a></li>
+									<li class="sub_menu"><a href=" {{ url('/barang_masuk/bon_teknik/?data=noComplete') }} ">Input Bon Teknik</a></li>
 									<li><a href="{{ url('/barang_masuk/bon_teknik/') }}">View Data</a>
 									</li>
 								</ul>
@@ -51,6 +51,19 @@
 							<li><a href="form_validation.html">3. Input Barang</a></li>
 							<li><a href="form_validation.html">4. View Data</a></li>
 							<li><a href="form_validation.html">5. Update dan Delete</a></li>
+						</ul>
+					</li>
+					<li><a><i class="fa fa-desktop"></i> Komputer DNP PG <span class="fa fa-chevron-down"></span></a>
+						<ul class="nav child_menu">
+							@php
+									$arrUrlKomputer = [
+										"computers.index" => 'View Data',
+										"computers.create" => 'Input Komputer'
+									]
+							@endphp
+							@foreach ($arrUrlKomputer as $key => $item)
+								<li><a href="{{ route($key) }}">{{ $item }}</a></li>
+							@endforeach
 						</ul>
 					</li>
 					<li><a><i class="fa fa-desktop"></i> UI Elements <span class="fa fa-chevron-down"></span></a>

@@ -51,6 +51,8 @@
 .glyphicon-star:before {
   content: "\e006"; }
 
+body { background-color: red; }
+
 .glyphicon-star-empty:before {
   content: "\e007"; }
 
@@ -1390,7 +1392,9 @@ a:hover, a:focus {
   border-right: 5px solid #1ABB9C; }
 
 .nav li.current-page {
-  background: rgba(255, 255, 255, 0.05); }
+  background: rgba(255, 255, 255, 0.05); 
+  background-color: rgba(38, 185, 154, 0.88);
+}
 
 .nav li li li.current-page {
   background: none; }
@@ -2078,6 +2082,8 @@ ul.msg_list li a .image img {
   float: left;
   margin-right: 10px;
   width: 11%; }
+
+body { background-color: redxd; }
 
 ul.msg_list li a .time {
   font-size: 11px;
