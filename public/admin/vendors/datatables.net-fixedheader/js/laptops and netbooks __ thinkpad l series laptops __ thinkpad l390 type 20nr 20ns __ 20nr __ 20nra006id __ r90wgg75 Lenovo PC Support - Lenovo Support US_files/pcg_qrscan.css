@@ -1,0 +1,1 @@
+.modal#qrScanMessageBox{z-index:1000000}.qrscan-box{border-radius:0;text-align:center;width:100%;height:100%;position:fixed;top:0;right:0;bottom:0;left:0;margin:auto;background-color:#aaa;z-index:999999;display:none}.qrscan-box video{width:100%;height:100%}.qrscan-box .scan_close{position:relative;bottom:10%;left:auto;right:auto}

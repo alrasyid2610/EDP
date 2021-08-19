@@ -1,0 +1,288 @@
+let redportOption = {};
+//let select=['best5','kyd5'];
+(function (redportOption) {
+	var addonSelection = [];
+	var warrantySelection = null;
+	var serviceMap = {};
+	var rawdata = {};
+
+	redportOption.init = function (initData) {
+		try{
+			var temp;
+			var found;
+			initData.forEach(function (x) {
+				if (x.type === 'warranty' && x.own > 0) {
+					temp = JSON.parse(JSON.stringify(x));
+					temp.duration = [temp.own];
+					temp.name = 'CURRENT';
+				}
+				if (x.type === 'warranty' && x.name === 'CURRENT')
+					found = true;
+			})
+			if (!found && temp)
+				initData.push(temp);
+
+			rawdata = JSON.parse(JSON.stringify(initData));
+			initData.forEach(function (x) {
+				if (x.type === "addon" && x.own > 0) {
+					if ( x.duration && x.duration.length>0)
+						addonSelection.push({ 'name': x.name, 'duration':x.duration[0] });
+				}
+
+				serviceMap[x.name] = x;
+			})
+
+			if (!serviceMap['CURRENT'])
+				serviceMap['CURRENT']={"name":"CURRENT","code":null,"type":null,"duration":[],"dependency":[],"pn":null,"own":-1}
+
+			warrantySelection = { 'name': 'CURRENT', 'duration': serviceMap['CURRENT'].own };
+
+			//console.log(warrantySelection)
+			//console.log(addonSelection)
+		} catch (error){
+		}
+	}
+
+	redportOption.click = function (name, duration) {
+		try{
+			//console.log(name)
+			var service = serviceMap[name];
+			if (service) {
+				if (service.type === 'warranty') {
+					return warrantyClick(name, duration);
+				}
+				if (service.type === 'addon') {
+					return addonClick(name, duration);
+				}
+			}
+			//console.log(addonSelection)
+		} catch (error){
+		}
+	}
+
+
+	function warrantyClick(name, duration) {
+		//console.log(name)
+		var show = [];
+		var select = [];
+
+		//console.log(warrantySelection)
+		if (name === 'CURRENT' || (name === warrantySelection.name && duration===warrantySelection.duration)) {
+			name = 'CURRENT';
+			duration = serviceMap['CURRENT'].own;
+			if (duration != -1)
+				warrantySelection = { 'name': 'CURRENT', 'duration': serviceMap['CURRENT'].own };
+			else
+				warrantySelection = {'name': 'CURRENT', 'duration': -1};
+		}
+		else {
+			warrantySelection = { 'name': name, 'duration': duration };
+		}
+		select = buildSelect(name, duration, true);
+		show = buildShow(name, duration);
+		filter(select, select);
+		filter(show, select);
+		setISEduration(select, show);
+		return { 'show': show, 'select': select };
+	}
+
+	function addonClick(name, duration) {
+		//console.log('2222')
+		var show = [];
+		var select = [];
+		var temp = null;
+		var needAdd = true;
+		addonSelection.forEach(function (x) {
+			if (x.name === name) {
+				needAdd = false;
+				if (x.duration === duration)
+					temp = x;
+				else
+					x.duration = duration;
+			}
+		})
+		if (temp) {
+			//console.log(addonSelection)
+			addonSelection.splice(addonSelection.indexOf(temp),1);
+			//console.log(addonSelection)
+		}
+		else {
+			if (needAdd)
+				addonSelection.push({ 'name': name, 'duration': duration });
+		}
+		//console.log(warrantySelection)
+		select = buildSelect(warrantySelection.name, warrantySelection.duration, false);
+		show = buildShow(warrantySelection.name, warrantySelection.duration);
+		filter(select, select);
+		filter(show, select);
+		setISEduration(select, show);
+		//setISEduration(show,select)
+		return { 'show': show, 'select': select };
+	}
+
+	function addonChangeDuration(name, duration) {
+		var show = [];
+		var select = [];
+		var temp = null;
+		addonSelection.forEach(function (x) {
+			if (x.name === name) {
+				x.duration = duration;
+			}
+		})
+
+		select = buildSelect(warrantySelection.name, warrantySelection.duration);
+		show = buildShow(warrantySelection.name, warrantySelection.duration);
+		filter(select, select);
+		filter(show, select);
+		//setISEduration(show,select)
+		return { 'show': show, 'select': select };
+	}
+
+
+	function buildSelect(warrantyName, warrantyDuration, isWarrantyClicked) {
+		if  (warrantyDuration <= 0) return [];
+		var result = [];
+		var hidden = []
+		result.push({ 'name': warrantyName, 'duration': warrantyDuration });
+		addonSelection.forEach(function (x) {
+			var service = serviceMap[x.name];
+			//console.log(addonSelection)
+			if (isWarrantyClicked && service.duration.indexOf(warrantyDuration) >= 0) {
+				result.push({ 'name': x.name, 'duration': warrantyDuration });
+				return;
+			}
+			if (x.duration <= warrantyDuration) {
+				result.push(x);
+				return;
+			}
+			if (service.duration.indexOf(warrantyDuration) >= 0) {
+				result.push({ 'name': x.name, 'duration': warrantyDuration });
+				return;
+			}
+			hidden.push(x);
+		})
+
+		addonSelection.splice(0,addonSelection.length)
+		result.forEach(function (x) {
+			if (serviceMap[x.name].type==='addon') {
+				addonSelection.push(x);
+			}
+		})
+		hidden.forEach(function (x) {
+			if (serviceMap[x.name].type==='addon') {
+				addonSelection.push(x);
+			}
+		})
+		//console.log('addonSelection')
+		//console.log(addonSelection)
+		return result;
+	}
+
+	function buildShow(warrantyName, warrantyDuration) {
+		if  (warrantyDuration <= 0) return [];
+		var result = [];
+
+		rawdata.forEach(function (x) {
+
+			var service = serviceMap[x.name];
+			for (var i = warrantyDuration; i >= 12; i = i - 12) {
+				if (service.duration.indexOf(i) >= 0) {
+					result.push({ 'name': x.name, 'duration': i });
+					break;
+				}
+			}
+		})
+
+		return result;
+	}
+
+	function filter(data, select) {
+		var removelist = [];
+		data.forEach(function (x) {
+			var service = serviceMap[x.name];
+			if (service.dependency.length === 0) return;
+			var found = false;
+
+			for (var i in service.dependency) {
+				for (var j in rawdata) {
+					if (rawdata[j].own > 0 && service.dependency[i] === rawdata[j].code) {
+						found = true;
+						break;
+					}
+				}
+				if (found) break;
+
+				for (var j in select) {
+					if (service.dependency[i] === select[j].name) {
+						found = true;
+						break;
+					}
+				}
+				if (found) break;
+			}
+			if (found) return;
+			//console.log(x.name)
+			removelist.push(x);
+		})
+		removelist.forEach(function (x) {
+			data.splice(data.indexOf(x),1);
+		})
+	}
+
+	function setISEduration(select, show) {
+
+		var duration = 0;
+		var iseown=0;
+		rawdata.forEach(function (x) {
+			if (x.name === 'ADP' || x.name === 'KYD' || x.name === 'SB') {
+				if (x.own > duration)
+					duration = x.own;
+			}
+			if (x.name === 'ISE') {
+				if (x.own > iseown)
+					iseown=x.own;
+			}
+		})
+		select.forEach(function (x) {
+			if (x.name === 'ADP' || x.name === 'KYD' || x.name === 'SB') {
+				if (x.duration > duration)
+					duration = x.duration;
+			}
+		})
+		//console.log(duration)
+
+		if (duration <= iseown) {
+			duration=0;
+		}
+		var temp = null;
+		show.forEach(function (x) {
+			if (x.name === 'ISE') {
+				if (duration > 0)
+					x.duration = duration;
+				else
+					temp = x;
+			}
+		})
+		if (temp) {
+			show.splice(show.indexOf(temp),1);
+		}
+
+		select.forEach(function (x) {
+			if (x.name === 'ISE') {
+				if (duration > 0)
+					x.duration = duration;
+				else
+					temp = x;
+			}
+		})
+		if (temp) {
+			select.splice(select.indexOf(temp),1);
+		}
+
+		//var ise=serviceMap['ISE']
+		//if (temp && ise.duration.indexOf(duration)<0) {
+		//show.splice(show.indexOf(temp))
+		//}
+	}
+
+})(redportOption)

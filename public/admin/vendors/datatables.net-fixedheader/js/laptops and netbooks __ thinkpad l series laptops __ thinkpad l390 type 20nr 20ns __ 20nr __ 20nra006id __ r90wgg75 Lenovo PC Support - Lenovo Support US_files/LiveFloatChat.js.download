@@ -1,0 +1,165 @@
+(function ($, w) {
+    var floatChatWindow = $('#float-chat-window');
+    var html = [
+        '<link href="/esv4/plugins/contactus/livefloatchat/livefloatchat.css" rel="stylesheet" />',
+        '<div class="chatWindow" style="display: none">',
+        '<a class="chatClose"></a>',
+        '<div class="chatContent">',
+        '<img class="chatImg" src="/msa/contact/plugins/Contactus/contactChat.png">',
+        '<h4 t="chat with a lenovo specialist|Chat with a Lenovo Specialist"></h4>',
+        '<div class="btns">',
+        '<a class="button blue ok" t="yes" href="{{WarrantyLookupUrl}}"></a>',
+        '<button class="button blue right no" t="no"></button>',
+        '<div class="reset"></div>',
+        '</div>',
+        '<input type="checkbox" class="closeChoose"><label t="do not ask again"></label>',
+        '</div>',
+        '</div>'
+    ];
+    var aiHtml = [
+        '<link href="/esv4/plugins/contactus/livefloatchat/livefloatchat.css" rel="stylesheet" />',
+        '<div class="aiChatWindow" style="display: none">',
+        '<p class="close-btn icon-s-close" id="moli_close_btn"></p>',
+        '<div class="hovertext">',
+        '<p t="lena chatbot tool tip|Lenovo Virtual Agent Lena can help troubleshoot issues with your PC product."></p>',
+        '</div>',
+        '<p class="moli-lets-chat moli-msg" t="how can i help you|How can I help you?">How can I help you?</p>',
+        '<img src="/esv4/plugins/contactus/livefloatchat/lena_new_39.png" class="lenaImg">',
+        '</div>'
+    ];
+    var isAvailableUrl = l.UrlUtility.getFullServicesPath("/contactus/isAvailable?_t=" + (new Date()).getTime());
+    var methods = {
+        IsAvailable: false,
+        matchList: [],
+        //for SR-689
+        track: function (type) {
+            type = type || 'chat_invitation_offered';
+            if (_satellite && _satellite.track) {
+                _satellite.track(type);
+            }
+        },
+        lenaTrack: function () {
+            if (_satellite && _satellite.track) {
+                let obj = {
+                    type: "eSupportProcess_Complete",
+                    name: "Lena ChatBot Robot Click",
+                    action: "Click",
+                };
+                l.DTM.Lmd.push(obj);
+            }
+        },
+        isShowFloatChat: function () {
+            return !!Cookies.get("isShowFloatChat");
+        },
+        showAction: function (e, url) {
+            url = url || window.location.pathname;
+            var results = methods.matchList.filter(function (x) {
+                return x.test(url);
+            });
+            if (results && results.length > 0) {
+                methods.showWindow();
+                return;
+            }
+            methods.hideWindow();
+        },
+        init: function () {
+            $(window).on("pspSectionChanged", methods.showAction);
+            floatChatWindow.on("click", ".no,.chatClose", methods.chatClose);
+            floatChatWindow.on("click", ".closeChoose", methods.closeChoose);
+            floatChatWindow.on("click", "a.ok", methods.accepted);
+            methods.initChat(window.location.href);
+            w.LiveFloatChat = w.LiveFloatChat || methods.initChat;
+
+        },
+        accepted: function () {
+            methods.track('chat_invitation_accepted');
+            return true;
+        },
+        showWindow: function () {
+            if (methods.isShowFloatChat() && methods.IsAvailable)
+                return;
+            $(".chatWindow,.aiChatWindow", floatChatWindow).show();
+            if ($('.chatWindow').is(':visible')) {
+                methods.track('chat_invitation_offered');
+            }
+        },
+        hideWindow: function () {
+            $(".chatWindow,.aiChatWindow", floatChatWindow).hide();
+        },
+        initCallback: function (data) {
+            methods.IsAvailable = data.IsAvailable;
+            if (!data || !methods.IsAvailable) {
+                methods.hideWindow();
+                return;
+            }
+            if (data.UrlTests && data.UrlTests.length > 0) {
+                for (var i = 0; i < data.UrlTests.length; i++) {
+                    methods.matchList.push(new RegExp(data.UrlTests[i]));
+                }
+            }
+            var stayTime = data.StayTimeToShow;
+            data.WarrantyLookupUrl = data.WarrantyLookupUrl || 'javascript:;';
+            if (data.EnableChatBot) {
+                floatChatWindow.html(methods.mustacheCompile(aiHtml.join(''), data));
+                methods.aiChat(floatChatWindow, data);
+                var span = $("span", floatChatWindow);
+                $(floatChatWindow).hover(function () {
+                    span.show();
+                }, function () {
+                    span.hide();
+                });
+            } else {
+                floatChatWindow.html(methods.mustacheCompile(html.join(''), data));
+            }
+            if (stayTime && stayTime > 0) {
+                setTimeout(methods.showAction, stayTime);
+                return;
+            }
+
+            methods.showAction();
+        },
+        aiChat: function (html, data) {
+            html.on("click", "div.hovertext,img.lenaImg,p.moli-msg", function () {
+                methods.openLenaWindow(data.WarrantyLookupUrl);
+            });
+            html.on("click", ".close-btn", function () {
+                methods.hideWindow();
+                floatChatWindow.hide();
+            });
+        },
+        openLenaWindow: function (url) {
+            var win = window.open(url, '_blank');
+            win.focus();
+            methods.lenaTrack();
+        },
+        chatClose: function () {
+            methods.track("chat_invitation_rejected");
+            methods.hideWindow();
+        },
+        closeChoose: function () {
+            var value = $(this).prop("checked");
+            if (value) {
+                Cookies.set("isShowFloatChat", false, { path: "/" });
+            }
+        },
+        initChat: function () {
+            $.get(isAvailableUrl, methods.initCallback);
+        },
+        mustacheCompile: function (str, data) {
+            var reg = /\{\{(.*?)\}\}/;
+            if (!reg.exec(str)) return str;
+
+            var tmp = str;
+            while (reg.exec(str)) {
+                var placeholder = reg.exec(tmp)[0];
+                var key = reg.exec(tmp)[1];
+                tmp = tmp.replace(placeholder, '');
+                str = str.replace(placeholder, data[key] ? data[key].toString() : '');
+            }
+
+            return str;
+        }
+    };
+    methods.init();
+    w.openLenaWindow = methods.openLenaWindow;
+})(jQuery, window);

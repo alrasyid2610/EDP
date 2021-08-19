@@ -1,0 +1,293 @@
+var eomCartUtils = {
+    userCart: {},
+    orderFlow: {}
+};
+
+(function () {
+    var httpRequest = function (method, uri, param, callback, async) {
+        var url = l.UrlUtility.getFullServicesPathV4("/eomCart" + uri);
+        if (method == "GET" && param) {
+            url += url.indexOf("?") > 0 ? "&" : "?";
+            for (var key in param) {
+                url += key + "=" + encodeURIComponent(param[key]) + "&";
+            }
+            url = url.substring(0, url.length - 1);
+        }
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                var ret = null;
+                if (this.status == 200 && this.responseText) {
+                    try {
+                        ret = JSON.parse(this.responseText);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
+                if (ret) {
+                    callback(ret);
+                } else {
+                    callback({ code: 100, msg: { desc: "Failed", value: null }, data: null });
+                }
+            }
+        };
+
+        xhttp.open(method, url, async);
+        if (method == "POST") {
+            xhttp.setRequestHeader("content-type", "application/json;charset=UTF-8");
+        }
+
+        if (method == "POST" && param) {
+            xhttp.send(JSON.stringify(param));
+        } else {
+            xhttp.send();
+        }
+    };
+
+    var callHttp = function (method, uri, param) {
+        return new Promise(function (resolve, reject) {
+            httpRequest(method, uri, param, function (ret) {
+                if (ret.code == 0) {
+                    resolve(ret.data);
+                } else {
+                    reject(ret);
+                }
+            }, true);
+        });
+    };
+
+    eomCartUtils.isSupportSale = function (channel, productType) {
+        if (eomCartUtils.userCart.fot=="true" || l.UrlUtility.getUrlParam("redportfot") == "true") {
+            return true;
+        }
+        var config = eomCartUtils.shopConfigs;
+        if (!config || !channel) {
+            return false;
+        }
+
+        if (!config.channels || config.channels.length == 0) { // Empty means support all channel and product type
+            return true;
+        }
+
+        for (var i in config.channels) {
+            var channelItem = config.channels[i];
+            if (channelItem.channel.toLowerCase() != channel.toLowerCase()) {
+                continue;
+            }
+
+            if (!productType) { // Do not check product type
+                return true;
+            }
+
+            if (!channelItem.productTypes || channelItem.productTypes.length == 0) { // Empty means support all product type
+                return true;
+            }
+
+            for (var j in channelItem.productTypes) {
+                if (channelItem.productTypes[j].toLowerCase() == productType.toLowerCase()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    };
+
+    eomCartUtils.userCart.isSupportSale = function (productType) {
+        return eomCartUtils.isSupportSale(eomCartUtils.userCart.channel, productType);
+    }
+
+    eomCartUtils.userCart.setProperty = function (name, value, defaultValue) {
+        if (!name) return;
+        if (!value) {
+            value = sessionStorage.getItem("eomUserCartProperties_" + name);
+        }
+        if (!value && defaultValue) {
+            value = defaultValue;
+        }
+        eomCartUtils.userCart[name] = value;
+        if (value) {
+            sessionStorage.setItem("eomUserCartProperties_" + name, value);
+        }
+    };
+
+    eomCartUtils.userCart.get = function (channel) {
+        return callHttp("POST", "/user/get", { channel: channel || eomCartUtils.userCart.channel });
+    };
+
+    var mobileRE = /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series[46]0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i;
+    
+    eomCartUtils.userCart.add = function (data) {
+        data = Object.assign({
+            channel: eomCartUtils.userCart.channel,
+            cid: eomCartUtils.userCart.cid,
+            source: eomCartUtils.userCart.source,
+            subSource: eomCartUtils.userCart.subSource,
+            posaId: eomCartUtils.userCart.posaId,
+            client: mobileRE.test(navigator.userAgent) ? "Mobile":""
+        }, data);
+
+        var uri = "/user/add";
+        if (eomCartUtils.userCart.fot) {
+            uri += "?fot=" + eomCartUtils.userCart.fot;
+        }
+        return callHttp("POST", uri, data);
+    };
+
+    eomCartUtils.userCart.addMulti = function (data) {
+        data = Object.assign({
+            channel: eomCartUtils.userCart.channel,
+            cid: eomCartUtils.userCart.cid,
+            subSource: eomCartUtils.userCart.subSource
+        }, data);
+
+        var uri = "/user/addMulti";
+        if (eomCartUtils.userCart.fot) {
+            uri += "?fot=" + eomCartUtils.userCart.fot;
+        }
+        return callHttp("POST", uri, data);
+    };
+
+    eomCartUtils.userCart.update = function (data) {
+        data = Object.assign({ channel: eomCartUtils.userCart.channel }, data);
+        return callHttp("POST", "/user/update", data);
+    };
+
+    eomCartUtils.userCart.delete = function (data) {
+        data = Object.assign({ channel: eomCartUtils.userCart.channel }, data);
+        return callHttp("POST", "/user/delete", data);
+    };
+
+    eomCartUtils.userCart.clear = function (channel) {
+        return callHttp("POST", "/user/clear", { channel: channel || eomCartUtils.userCart.channel });
+    };
+
+    eomCartUtils.userCart.applyCoupon = function (couponNumber, channel) {
+        var uri = "/user/applyCoupon";
+        if (eomCartUtils.userCart.fot) {
+            uri += "?fot=" + eomCartUtils.userCart.fot;
+        }
+        return callHttp("POST", uri, { couponNumber: couponNumber, channel: channel || eomCartUtils.userCart.channel });
+    };
+
+    var createInputAndAppendTo = function (name, value, form) {
+        input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name
+        input.value = value;
+        form.append(input);
+    };
+
+    var createForm = function (data, returnUrl) {
+        var form = document.createElement("Form");
+        form.method = "POST";
+        form.action = data.url;
+        createInputAndAppendTo("userId", data.userId, form);
+        createInputAndAppendTo("token", data.token, form);
+        createInputAndAppendTo("anonymous", data.anonymous, form);
+        createInputAndAppendTo("errorUrl", l.UrlUtility.getFullPath('/handlemessage', true), form);
+        createInputAndAppendTo("partsalesTargetUrl", returnUrl, form);
+        return form;
+    }
+
+    eomCartUtils.userCart.checkout = function (channel) {
+        return new Promise(function (resolve, reject) {
+            callHttp("POST", "/user/checkout", { channel: channel || eomCartUtils.userCart.channel }).then(function (data) {
+                var returnUrl = Cookies.get("clickViewPage") || location.href.toString();
+                var form = createForm(data, returnUrl);
+                document.body.append(form);
+                form.submit();
+                resolve();
+            }).catch(function (err) {
+                reject(err);
+            });
+        });
+    };
+
+    eomCartUtils.orderFlow.auth = function (channel, msdSSOToken) {
+        return callHttp("POST", "/orderFlow/auth", { channel: channel, msdSSOToken: msdSSOToken });
+    };
+
+    eomCartUtils.orderFlow.queryHistories = function (data) {
+        return callHttp("POST", "/orderFlow/queryHistories", data);
+    };
+
+    eomCartUtils.orderFlow.sendHistoryEmail = function (channel, orderNumber, attachPDF, to, cc) {
+        return callHttp("POST", "/orderFlow/sendHistoryEmail", { channel: channel, orderNumber: orderNumber, attachPDF: attachPDF, to: to, cc: cc });
+    };
+
+    eomCartUtils.orderFlow.add = function (data) {
+        var uri = "/orderFlow/add";
+        var fot = l.UrlUtility.getUrlParam("redportfot");
+        if (fot) {
+            uri += "?fot=" + fot;
+        }
+        return callHttp("POST", uri, data);
+    };
+
+    eomCartUtils.orderFlow.applyCoupon = function (channel, cartUserId, couponNumber, cecId) {
+        var uri = "/orderFlow/applyCoupon";
+        var fot = l.UrlUtility.getUrlParam("redportfot");
+        if (fot) {
+            uri += "?fot=" + fot;
+        }
+        return callHttp("POST", uri, { channel: channel, cartUserId: cartUserId, couponNumber: couponNumber, cecId: cecId });
+    };
+
+    eomCartUtils.orderFlow.submit = function (channel, cartUserId) {
+        return callHttp("POST", "/orderFlow/submit", { channel: channel, cartUserId: cartUserId });
+    };
+
+    eomCartUtils.orderFlow.get = function (orderNumber, token) {
+        return callHttp("POST", "/orderFlow/get", { orderNumber: orderNumber, token: token });
+    };
+
+    eomCartUtils.orderFlow.reject = function (orderNumber, token, rejectReason) {
+        return callHttp("POST", "/orderFlow/reject", { orderNumber: orderNumber, token: token, rejectReason: rejectReason });
+    };
+
+    eomCartUtils.orderFlow.accept = function (orderNumber, token) {
+        return new Promise(function (resolve, reject) {
+            callHttp("POST", "/orderFlow/accept", { orderNumber: orderNumber, token: token }).then(function (data) {
+                var returnUrl = Cookies.get("clickViewPage") || location.href.toString();
+                var form = createForm(data, returnUrl);
+                document.body.append(form);
+                form.submit();
+                resolve();
+            }).catch(function (err) {
+                reject(err);
+            });
+        });
+    };
+
+    var initShopConfigs = function () {
+        httpRequest("GET", "/getShopConfigs", {
+            country: l.CultureUtility.getCurrentCountry(),
+            language: l.CultureUtility.getCurrentLanguage()
+        }, function (ret) {
+            if (ret && ret.data) {
+                eomCartUtils.shopConfigs = ret.data;
+            }
+        }, false);
+    };
+
+    var initUserCartProperties = function () {
+        eomCartUtils.userCart.setProperty("channel", null, "APOS");
+        eomCartUtils.userCart.setProperty("source", l.UrlUtility.getUrlParam("source") || l.UrlUtility.getUrlParam("utm_source"));
+        eomCartUtils.userCart.setProperty("posaId", l.UrlUtility.getUrlParam("posaId"));
+        eomCartUtils.userCart.setProperty("subSource", l.UrlUtility.getUrlParam("subSource"));
+        eomCartUtils.userCart.setProperty("cid", l.UrlUtility.getUrlParam("cid"));
+        eomCartUtils.userCart.setProperty("urlCoupon", l.UrlUtility.getUrlParam("coupon"));
+        eomCartUtils.userCart.setProperty("fot", l.UrlUtility.getUrlParam("redportfot"));
+        if (eomCartUtils.userCart.source && eomCartUtils.userCart.source.toLowerCase() == "posa") {
+            eomCartUtils.userCart.setProperty("channel", "POSA_TAKE_HOME");
+        }
+    };
+    
+    initShopConfigs();
+    initUserCartProperties();
+})(eomCartUtils);
+
+window.eomCartUtils = eomCartUtils;
