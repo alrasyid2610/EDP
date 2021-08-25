@@ -891,6 +891,7 @@
                     // // console.log(editData);
 
                     $('#service').modal({
+                        
                         show: true,
                     });
 
