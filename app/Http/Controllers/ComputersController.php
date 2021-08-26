@@ -374,7 +374,7 @@ class ComputersController extends Controller
 
         return redirect()->back();
     }
-
+    
     public function editComputer($id, Request $request)
     {
         dd($id);
@@ -388,4 +388,5 @@ class ComputersController extends Controller
 
         return redirect()->back();
     }
+
 }

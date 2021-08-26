@@ -112,7 +112,7 @@ Route::resource('/computers', ComputersController::class)
 Route::put('/users/{id}/edit', [ComputersController::class, 'editUser'])
     ->middleware(['auth'])
     ->name('users.editProfile');
-
+    
 Route::put('/computer/{id}/editprogram', [ComputersController::class, 'editProgram'])
     ->middleware(['auth'])
     ->name('computer.editProgram');
@@ -124,6 +124,7 @@ Route::put('/computer/{id}/editComputer', [ComputersController::class, 'editComp
 Route::put('/monitor/{id}/editMonitor', [ComputersController::class, 'editMonitor'])
     ->middleware(['auth'])
     ->name('monitor.editMonitor');
+
 
 Route::post('/test2', [TechnicalDocumentController::class, 'test2'])->name('test2');
 Route::view('/test2', 'test2');
