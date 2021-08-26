@@ -356,4 +356,22 @@ class ComputersController extends Controller
         return response()->json(array('success' => 'Data Successfully Deleted', 'html' => $returnHTML));
         # code...
     }
+
+
+
+    public function editUser($id, Request $request)
+    {
+        $data = request()->except(['_token', '_method']);
+        ComputerUser::find($id)->update($data);
+
+        return redirect()->back();
+    }
+
+    public function editProgram($id, Request $request)
+    {
+        $data = request()->except(['_token', '_method']);
+        Computer::find($id)->update($data);
+
+        return redirect()->back();
+    }
 }

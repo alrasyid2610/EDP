@@ -69,19 +69,17 @@
           <div class="modal-body">
             <form 
               method="POST"
-              v-bind:action="editAction.url"
               id='form'
+              :action='url'
               >
                 @csrf
                 @method('PUT')
                 <div id="inputsection">
 
 
-              {{-- <h4>Pengembalian dari User ke EDP</h4> --}}
-
-                    <div class="form-row"
-                        v-if="editAction.data == 'Profile'"
-                    >
+                    <div 
+                    class="form-row"
+                    v-if="getActionModel == 'Profile'">
 
                         <div class="col-lg-6 mb-3">
                             <label for="nik">NIK User</label>
@@ -146,8 +144,10 @@
                             @endif
                         </div>
                     </div>
-                    <div id="step-2" class="form-row" role="tabpanel"
-                        v-else-if="editAction.data == 'Computer'">
+                    <div 
+                    id="step-2" 
+                    class="form-row" role="tabpanel"
+                    v-else-if="getActionModel == 'Computer'">
                         <div class="col-lg-8 mb-3">
                         <label for="pc_name">PC Name</label>
                         <input type="text" class="form-control" id="pc_name" placeholder="PC Name" name="pc_name" required=""
@@ -266,8 +266,9 @@
                             required="" value="{{ $dataComputer[0]->computer_date ?? '' }}">
                         </div>
                     </div>
-                    <div class="form-row"
-                    v-else-if="editAction.data == 'Monitor'"
+                    <div 
+                    class="form-row"
+                    v-else-if="getActionModel == 'Monitor'"
                     >
                         <div id="step-4" class="tab-pane" role="tabpanel">
                             <div class="col-md-6 mb-3">
@@ -317,7 +318,7 @@
                         </div>
                     </div>
                     <div id="step-3" class="form-row" role="tabpanel"
-                    v-else-if="editAction.data == 'Program'">
+                    v-else-if="getActionModel == 'Program'">
                         <div id="sectionProgram">
 
                             <div class="col-md-6 mb-3">
@@ -471,7 +472,7 @@
                                                         <button 
                                                         {{-- data-toggle="modal" 
                                                         data-target="#service"  --}}
-                                                            class="btn btn-success" type="button" @click="test(this)">Edit</button>
+                                                            class="btn btn-success" type="button" @click="test()">Edit</button>
                                                         {{-- <a class="btn btn-success text-white" type="button">Edit</a> --}}
                                                     </div>
                                                     <a type="submit" class="btn btn-primary" href="{{ route('computers.index') }}" name="btnAddMore" value="Edit Profile" />Back</a>
@@ -869,6 +870,8 @@
             return {
                 kocak: 'kocal lu ndrow',
                 editAction: '',
+                actionModal: '',
+                url: '',
                 dataUser: '',
                 dataComputer: '',
                 urlAction: '',
@@ -877,48 +880,33 @@
 
         },
 
+        computed: {
+            getActionModel() {
+                return this.actionModal;
+            }
+        },
+
+        watch: {
+            editAction() {
+                this.actionModal = this.editAction.split('|')[0].trim();
+                this.url = this.editAction.split('|')[1].trim();
+            }
+        },
+
         methods: {
-            test: function(el) {
-
-                var data = this.editAction.split('|')[0];
-
-                if (this.editAction == '') {
-                    
-                } else {
-                    
-
-                    // var editData = this.editAction.data;
-                    // // console.log(editData);
-
-                    $('#service').modal({
-                        
-                        show: true,
-                    });
-
-                    $('#service').on('shown.bs.modal', function (a = 'a', b = data) {
-
-                        console.log(b);
-                        
-                        // if (b == 'Program') {
-                        //     console.log('oke cak');
-                        //     // this.elProgram = $('#form #sectionProgram').clone();
-                        //     // console.log(this.elProgram);
-                        // }
-                    });
-
-                    $('#service').on('hidden.bs.modal', function (e, b = '') {
-                        console.log(b);
-                        // var d = $('#form #inputsection').html('');
-                        // if (editData == 'Program') {
-                        //     // $('#form #sectionProgram').replaceWith(this.elProgram);
-                        // }
-                    });
-                }
+            test() {
+                
+                $('#service').modal({
+                    show: true,
+                });
 
                 this.dataUser = {!! $data->get_user !!},
                 this.dataComputer = {!! $data->get_computer !!}
+                
             }
         }
+
+
     });
         
         

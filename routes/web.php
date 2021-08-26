@@ -109,25 +109,13 @@ Route::resource('/goods_come', GoodComeController::class);
 Route::resource('/computers', ComputersController::class)
     ->middleware(['auth']);
 
-Route::put('/users/{id}/edit', function ($id) {
-    $data = request()->except(['_token', '_method']);
-    ComputerUser::find($id)->update($data);
-})->middleware(['auth'])->name('users.editProfile');
+Route::put('/users/{id}/edit', [ComputersController::class, 'editUser'])
+    ->middleware(['auth'])
+    ->name('users.editProfile');
 
-Route::put('/computer/{id}/editprogram', function ($id) {
-    $data = request()->except(['_token', '_method']);
-    Computer::find($id)->update($data);
-})->middleware(['auth'])->name('computer.editProgram');
-
-Route::put('/computer/{id}/editComputer', function ($id) {
-    dd(request());
-})->middleware(['auth'])->name('computer.editComputer');
-
-Route::put('/monitors/{id}/editprogram', function ($id) {
-    dd(request());
-})->middleware(['auth'])->name('monitor.editMonitor');
-
-
+Route::put('/computer/{id}/editprogram', [ComputersController::class, 'editProgram'])
+    ->middleware(['auth'])
+    ->name('computer.editProgram');
 
 Route::post('/test2', [TechnicalDocumentController::class, 'test2'])->name('test2');
 Route::view('/test2', 'test2');
