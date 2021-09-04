@@ -47,18 +47,10 @@ if (!function_exists('loopSelectData')) {
   function loopSelectData($data, $val, $type = '', $col = '')
   {
     foreach ($data as $item) {
-      if (isset($GLOBALS['a'])) {
-        if ($item == htmlentities($GLOBALS['a']->$val)) {
-          echo "<option value='$item' selected>$item</option>";
-        } else {
-          echo "<option value='$item'>$item</option>";
-        }
+      if ($item == $val) {
+        echo "<option value='$item' selected>$item</option>";
       } else {
-        if ($item == $val) {
-          echo "<option value='$item' selected>$item</option>";
-        } else {
-          echo "<option value='$item'>$item</option>";
-        }
+        echo "<option value='$item'>$item</option>";
       }
     }
   }

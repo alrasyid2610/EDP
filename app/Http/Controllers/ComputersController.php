@@ -364,7 +364,7 @@ class ComputersController extends Controller
         $data = request()->except(['_token', '_method']);
         ComputerUser::find($id)->update($data);
 
-        return redirect()->back();
+        return redirect()->back()->with(['message' => 'Data User Berhasil di Edit']);
     }
 
     public function editProgram($id, Request $request)
@@ -372,21 +372,35 @@ class ComputersController extends Controller
         $data = request()->except(['_token', '_method']);
         Computer::find($id)->update($data);
 
-        return redirect()->back();
+        return redirect()->back()->with(['message' => 'Data Program Berhasil di Edit']);
     }
-    
+
     public function editComputer($id, Request $request)
     {
-        dd($id);
+        // $dd = collect($request->only(['fa_computer', 'com_edp_number', 'computer_date']))->values();
+        Computer::find($id)->fix_asset->update([
+            'fixed_asset_number' => $request->fa_computer,
+            'edp_fixed_asset_number' => $request->com_edp_number,
+            'fixed_asset_date' => $request->computer_date
+        ]);
+        // $data_fix_asset = collect($dd)->merge(['item_type' => 'Computer']);
 
-        return redirect()->back();
+
+        $data = request()->except(['_token', '_method']);
+        Computer::find($id)->update($data);
+        return redirect()->back()->with(['message' => 'Data Computer Berhasil di Edit']);
     }
 
     public function editMonitor($id, Request $request)
     {
-        dd($id);
-
-        return redirect()->back();
+        dd($request);
+        Monitor::find($id)->fix_asset->update([
+            'fixed_asset_number' => $request->fa_monitor,
+            'edp_fixed_asset_number' => $request->edp_monitor_number,
+            'fixed_asset_date' => $request->monitor_date
+        ]);
+        $data = request()->except(['_token', '_method']);
+        Monitor::find($id)->update($data);
+        return redirect()->back()->with(['message' => 'Data Monitor Berhasil di Edit']);
     }
-
 }

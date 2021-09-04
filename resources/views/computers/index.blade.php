@@ -1,5 +1,9 @@
 @extends('layouts.main')
 @section('content')
+  <x-com-modalpesan></x-com-modalpesan>
+
+
+
   <div class="page-title">
     <div class="title_left col-md-12">
       <h3>Komputer <small> | <a href="{{ route('computers.create') }}" class="text-primary">Input Komputer</a> |
@@ -120,7 +124,6 @@
             });
         }
         
-       
 
     </script>
 @endsection

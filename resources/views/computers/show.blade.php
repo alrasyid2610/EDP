@@ -15,6 +15,8 @@
         $GLOBALS['a'] = $dataComputer[0];
     }
 
+    
+
     function loopSelectDataSection($dataSection, $val) {
       foreach ($dataSection as $item) {
             if ( $item->section_name == $val)  {
@@ -55,6 +57,14 @@
 </div>
 
 <div id="app">
+    
+    {{-- {{ dd($data->get_monitor->fix_asset->id) }} --}}
+    @if (session('message'))
+        <x-com-modalpesan :message="session('message')"></x-com-modalpesan>
+    @endif
+
+    
+
 
 {{-- FOR MODAL FORM Service --}}
     <div class="modal fade" id="service" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -144,6 +154,7 @@
                             @endif
                         </div>
                     </div>
+                    
                     <div 
                     id="step-2" 
                     class="form-row" role="tabpanel"
@@ -151,7 +162,7 @@
                         <div class="col-lg-8 mb-3">
                         <label for="pc_name">PC Name</label>
                         <input type="text" class="form-control" id="pc_name" placeholder="PC Name" name="pc_name" required=""
-                            value="{{ $dataComputer[0]->pc_name ?? '' }}"> 
+                            v-model="dataComputer.pc_name"> 
                             @if ($errors->has('pc_name')) 
                             <span class="text-danger">{{ $errors->first('pc_name') }}</span> 
                             @endif 
@@ -160,9 +171,10 @@
                         <label for="computer_operation">Computer Operation</label>
                         <select class="custom-select" name="computer_operation">
                             <option value="">-- Choose --</option>  
-                            @php
-                                loopSelectData(getDataComputerOperation(), 'computer_operation');
-                            @endphp
+                                {{-- loopSelectData(getDataComputerOperation(), 'computer_operation'); --}}
+                                @php
+                                    loopSelectData(getDataOs(), $data->get_computer->operating_system);
+                                @endphp
                         </select>
                         </div>
 
@@ -171,7 +183,7 @@
                         <select class="custom-select" name="pc_brand">
                             <option value="">-- Choose --</option>  
                             @php
-                                loopSelectData(getDataBrandPc(), 'pc_brand');
+                                loopSelectData(getDataBrandPc(), $data->get_computer->pc_brand);
                             @endphp
                         </select>
                         </div>
@@ -181,7 +193,7 @@
                         <select class="custom-select" id="processor" name="processor">
                             <option value="">-- Choose --</option>
                             @php
-                                loopSelectData(getDataProcessor(), 'processor');
+                                loopSelectData(getDataProcessor(), htmlentities($data->get_computer->processor));
                             @endphp
                         </select>
                         </div>
@@ -191,7 +203,7 @@
                         <select class="custom-select" name="operating_system">
                             <option value="">-- Choose --</option>\
                             @php
-                                loopSelectData(getDataOs(), 'operating_system');
+                                loopSelectData(getDataOs(), $data->get_computer->operating_system);
                             @endphp
                         </select>
                         </div>
@@ -199,7 +211,7 @@
                         <div class="col-lg-6 mb-3">
                         <label for="ram">Ram</label>
                         <input type="text" class="form-control" id="ram" placeholder="Ram" name="ram" required=""
-                            value="{{ $dataComputer[0]->ram ?? '' }}">  
+                            v-model:value="dataComputer.ram">  
                             @if ($errors->has('ram')) 
                             <span class="text-danger">{{ $errors->first('ram') }}</span> 
                             @endif
@@ -208,7 +220,7 @@
                         <div class="col-lg-6 mb-3">
                         <label for="hdd">HDD</label>
                         <input type="text" class="form-control" id="hdd" placeholder="HDD" name="hdd" required=""
-                            value="{{ $dataComputer[0]->hdd ?? '' }}">  
+                            v-model:value="dataComputer.hdd">  
                             @if ($errors->has('hdd')) 
                             <span class="text-danger">{{ $errors->first('hdd') }}</span> 
                             @endif
@@ -217,7 +229,7 @@
                         <div class="col-lg-6 mb-3">
                         <label for="ip">IP Komputer</label>
                         <input type="text" class="form-control" id="ip" placeholder="IP Komputer" name="ip" required=""
-                            value="{{ $dataComputer[0]->ip ?? '' }}">  
+                            v-model:value="dataComputer.ip">  
                             @if ($errors->has('ip')) 
                             <span class="text-danger">{{ $errors->first('ip') }}</span> 
                             @endif
@@ -228,24 +240,27 @@
                         <select class="custom-select" name="internet">
                             <option value="">-- Choose --</option>
                             @php
-                                loopSelectData(getDataEnumYN(), 'internet');
+                                loopSelectData(getDataEnumYN(), $data->get_computer->internet);
                             @endphp
                         </select>
                         </div>
 
                         <div class="col-lg-12 mb-3">
                         <label for="computer_description">Computer Description</label>
-                        <textarea name="computer_description"  class="form-control" id="" cols="30" rows="3">{{ $dataComputer[0]->computer_description ?? '' }}</textarea>
+                        <textarea name="computer_description"  class="form-control" id="" cols="30" rows="3">{{ $data->get_computer->computer_description }}</textarea>
                             @if ($errors->has('computer_description')) 
-                            <span class="text-danger">{{ $errors->first('computer_description') }}</span> 
+                            <span class="text-danger"></span> 
                             @endif
                         </div>
 
-                        <h2>Fix Asset Komputer</h2>
+                        <div class="col-12">
+                            <h2>Fix Asset Komputer</h2>
+                        </div>
+
                         <div class="col-lg-6 mb-3">
-                        <label for="fa_computer">Nomor Fix Asset</label>
-                        <input type="text" class="form-control" id="fa_computer" placeholder="Nomor Fix Asset Komputer" name="fa_computer" required=""
-                            value="{{ $dataComputer[0]->fa_computer ?? '' }}">  
+                            <label for="fa_computer">Nomor Fix Asset</label>
+                            <input type="text" class="form-control" id="fa_computer" placeholder="Nomor Fix Asset Komputer" name="fa_computer" required=""
+                            value="{{ $data->get_computer->fix_asset->fixed_asset_number }}">  
                             @if ($errors->has('fa_computer')) 
                             <span class="text-danger">{{ $errors->first('fa_computer') }}</span> 
                             @endif
@@ -254,7 +269,7 @@
                         <div class="col-lg-6 mb-3">
                         <label for="com_edp_number">EDP No</label>
                         <input type="text" class="form-control" id="com_edp_number" placeholder="EDP No" name="com_edp_number" required=""
-                            value="{{ $dataComputer[0]->com_edp_number ?? '' }}">  
+                            value="{{ $data->get_computer->fix_asset->edp_fixed_asset_number }}">  
                             @if ($errors->has('com_edp_number')) 
                             <span class="text-danger">{{ $errors->first('com_edp_number') }}</span> 
                             @endif
@@ -263,9 +278,10 @@
                         <div class="col-md-12 mb-3">
                         <label for="computer_date">Tanggal Fix Asset</label>
                         <input type="date" class="form-control" id="computer_date" placeholder="Tanggal Fix Asset" name="computer_date"
-                            required="" value="{{ $dataComputer[0]->computer_date ?? '' }}">
+                            required="" value="{{ $data->get_computer->fix_asset->fixed_asset_date }}">
                         </div>
                     </div>
+
                     <div 
                     class="form-row"
                     v-else-if="getActionModel == 'Monitor'"
@@ -294,16 +310,16 @@
                             <div class="col-lg-6 mb-3">
                             <label for="fa_monitor">Nomor Fix Monitor</label>
                             <input type="text" class="form-control" id="fa_monitor" placeholder="Nomor Fix Asset Komputer" name="fa_monitor" required=""
-                                value="{{ $dataComputer[0]->fa_monitor ?? '' }}">  
+                                value="{{ $data->get_monitor->fix_asset->fixed_asset_number }}">  
                                 @if ($errors->has('fa_monitor')) 
-                                <span class="text-danger">{{ $errors->first('fa_monitor') }}</span> 
+                                <span class="text-danger"></span> 
                                 @endif
                             </div>
 
                             <div class="col-lg-6 mb-3">
                             <label for="edp_monitor_number">EDP No</label>
                             <input type="text" class="form-control" id="edp_monitor_number" placeholder="EDP No" name="edp_monitor_number" required=""
-                                value="{{ $dataComputer[0]->edp_monitor_number ?? '' }}">  
+                                value="{{ $data->get_monitor->fix_asset->edp_fixed_asset_number }}">  
                                 @if ($errors->has('edp_monitor_number')) 
                                 <span class="text-danger">{{ $errors->first('edp_monitor_number') }}</span> 
                                 @endif
@@ -312,11 +328,12 @@
                             <div class="col-md-12 mb-3">
                             <label for="monitor_date">Tanggal Fix Asset</label>
                             <input type="date" class="form-control" id="monitor_date" placeholder="Tanggal Fix Asset" name="monitor_date"
-                                required="" value="{{ $dataComputer[0]->monitor_date ?? '' }}">
+                                required="" value="{{ $data->get_monitor->fix_asset->fixed_asset_date }}">
                             </div>
 
                         </div>
                     </div>
+
                     <div id="step-3" class="form-row" role="tabpanel"
                     v-else-if="getActionModel == 'Program'">
                         <div id="sectionProgram">
@@ -901,7 +918,8 @@
                 });
 
                 this.dataUser = {!! $data->get_user !!},
-                this.dataComputer = {!! $data->get_computer !!}
+                this.dataComputer = {!! $data->get_computer !!},
+                this.dataMonitor = {!! $data->get_monitor !!}
                 
             }
         }
@@ -917,6 +935,13 @@
             var href = $(this).val();
             $(this).parent().find('a').attr('href', href);
         })
+
+
+        $(document).ready(function () {
+            // $('#modalPesan .modal-body').html('Data Berhasil di Edit')
+            $('#modalPesan').modal('show');
+        });
+        
     </script>
 @endsection
 
