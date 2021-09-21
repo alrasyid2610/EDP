@@ -40,7 +40,11 @@ function DeleteBtn(e) {
 
             success: function (response) {
                 console.log('data id'  + response);
-                $("#table-data").html(response.html);
+                if(response.tableData == 'computer') {
+                    $("#datatable-buttons").html(response.html);
+                } else {
+                    $("#table-data").html(response.html);
+                }
                 $("#deleteModal").modal("hide");
                 $("#modalPesan .modal-body").html(`
                       ${response.success}

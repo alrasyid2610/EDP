@@ -11,6 +11,8 @@ use App\Models\FixAsset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use function PHPUnit\Framework\isNull;
+
 class ComputersController extends Controller
 {
     /**
@@ -103,7 +105,6 @@ class ComputersController extends Controller
             $arrMonitor,
             [
                 'edp_fixed_asset_number' => $request->edp_monitor_number,
-                'edp_fix_asset' => $request->fa_monitor,
                 'monitor_brand' => $request->monitor_brand,
                 'screen_plugs' => $request->screen_plugs,
                 // 'monitor_date' => $request->monitor_date
@@ -212,21 +213,12 @@ class ComputersController extends Controller
             $computer_user_id = $computer->computer_user_id;
             $computer_id = $computer->computer_id;
             $dataSection = Section::all('section_name');
-            // $user_data = ComputerUser::select('*')->where('id', '=' , $computer_user_id)->get();
-            // $computer_data = Computer::select('*')->where('id', '=' , $computer_id)->get();
-            // $monitor_id = Monitor::select('*')->where('id', '=' , $monitor_id)->get();
-            // dd($computer_data);
-            $data = DB::table('computer_operations as CO')
-                ->select('CU.*', 'C.*', 'CO.*', 'M.*')
-                ->join('computers as C', 'CO.computer_id', '=', 'C.id')
-                ->join('computer_users as CU', 'CO.computer_user_id', '=', 'CU.id')
-                ->join('monitors as M', 'CO.monitor_id', '=', 'M.id')
-                ->where('CO.id', '=', $computer->id)
-                ->get();
+
+            
             // dd($data);
             // dd($computer->monitor_id);
 
-            return view('computers.edit', ['page_action' => 'Edit', 'page_name' => 'Computer', 'data' => $data, 'dataSection' => $dataSection]);
+            return view('computers.edit', ['page_action' => 'Edit', 'page_name' => 'Computer', 'data' => $computer, 'dataSection' => $dataSection]);
         }
     }
 
@@ -290,28 +282,16 @@ class ComputersController extends Controller
         // $arrMonitor->push();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Computer  $computer
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Computer $computer)
-    {
-        //
-    }
-
-
-
     public function getData()
     {
         $data = DB::table('computer_operations as CO')
             ->select('CU.name', 'C.pc_name', 'C.ip', 'C.operating_system', 'CU.section', 'C.location', 'C.computer_operation', 'CO.id', 'C.created_at')
             ->join('computers as C', 'CO.computer_id', '=', 'C.id')
             ->join('computer_users as CU', 'CO.computer_user_id', '=', 'CU.id')
-            ->get();
+            ->orderBy('C.created_at', 'ASC')->get();
 
         $data2 = $data;
+
         $jumlahField = 27;
         $arr = [];
         foreach ($data2 as $key => $value) {
@@ -323,11 +303,68 @@ class ComputersController extends Controller
             array_push($arr, $datalengkappersen);
         }
 
-        $returnHTML = view('computers.tableData')->with(['data' => $data, 'data_persen' => $arr])->render();
+        $returnHTML = view('computers.tableData')->with(['data' => $data2, 'data_persen' => $arr])->render();
 
         return response()->json(array('success' => 'Data Successfully Deleted', 'html' => $returnHTML));
-        //  return response()->json($arrTemp[0]);
     }
+    
+    
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Computer  $computer
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id, Request $request)
+    {
+        $data = ComputerOperation::find($id);
+        
+        if (!is_null($data)) {
+            $computer = Computer::find($data->computer_id);
+            $computer_fix_asset = Computer::find($data->computer_id)->fix_asset;
+
+            $monitor = Monitor::find($data->monitor_id);
+            $monitor_fix_asset = Monitor::find($data->monitor_id)->fix_asset;
+
+            $user = ComputerUser::find($data->computer_user_id);
+
+            $data->delete();
+            $computer->delete();
+            $computer_fix_asset->delete();
+            $monitor->delete();
+            $monitor_fix_asset->delete();
+            $user->delete();
+
+            // $returnHTML = view('barang_masuk.surat_jalan.tableData')->with('data', $data)->render();
+            $data = DB::table('computer_operations as CO')
+            ->select('CU.name', 'C.pc_name', 'C.ip', 'C.operating_system', 'CU.section', 'C.location', 'C.computer_operation', 'CO.id', 'C.created_at')
+            ->join('computers as C', 'CO.computer_id', '=', 'C.id')
+            ->join('computer_users as CU', 'CO.computer_user_id', '=', 'CU.id')
+            ->orderBy('C.created_at', 'ASC')->get();
+
+            $data2 = $data;
+
+            $jumlahField = 27;
+            $arr = [];
+            foreach ($data2 as $key => $value) {
+                $jumlahNull = collect($value)->whereNull()->count();
+                $persen = round((float)number_format($jumlahNull / $jumlahField * 100, 2));
+                // $persen = $jumlahNull / $jumlahField * 100;
+                $datalengkappersen = 100 - $persen;
+
+                array_push($arr, $datalengkappersen);
+            }
+
+            $returnHTML = view('computers.tableData')->with(['data' => $data2, 'data_persen' => $arr])->render();
+
+            return response()->json(array('success' => 'Data Successfully Deleted', 'html' => $returnHTML, 'tableData' => 'computer'));
+
+        }
+    }
+
+
+
+    
 
     // DATA COMPUTER YANG BELUM LENGKAP (BELUM ADA DATA USER)
     public function getDataComputerIncomplete()
@@ -393,14 +430,16 @@ class ComputersController extends Controller
 
     public function editMonitor($id, Request $request)
     {
-        dd($request);
         Monitor::find($id)->fix_asset->update([
             'fixed_asset_number' => $request->fa_monitor,
             'edp_fixed_asset_number' => $request->edp_monitor_number,
             'fixed_asset_date' => $request->monitor_date
         ]);
-        $data = request()->except(['_token', '_method']);
-        Monitor::find($id)->update($data);
+        Monitor::find($id)->update([
+            'edp_fixed_asset_number' => $request->edp_monitor_number,
+            'screen_plugs' => $request->screen_plugs,
+            'monitor_brand' => $request->monitor_brand
+        ]);
         return redirect()->back()->with(['message' => 'Data Monitor Berhasil di Edit']);
     }
 }

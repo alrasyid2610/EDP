@@ -44,15 +44,28 @@ if (!function_exists('getDataProcessor')) {
 }
 
 if (!function_exists('loopSelectData')) {
-  function loopSelectData($data, $val, $type = '', $col = '')
+  function loopSelectData($data, $val = "", $type = '', $col = '')
   {
-    foreach ($data as $item) {
-      if ($item == $val) {
-        echo "<option value='$item' selected>$item</option>";
-      } else {
-        echo "<option value='$item'>$item</option>";
+    if ($type == 'section') {
+      # code...
+      foreach ($data as $item) {
+          if ($item['section_name'] == $val) {
+              echo "<option value='" . $item['section_name'] . "'selected>" . $item['section_name'] . "</option>";
+          } else {
+              echo "<option value='" . $item['section_name'] . "'>" . $item['section_name'] . "</option>";
+          }
+      }
+    } else {
+      foreach ($data as $item) {
+        if ($item == $val) {
+          echo "<option value='$item' selected>$item</option>";
+        } else {
+          echo "<option value='$item'>$item</option>";
+        }
       }
     }
+    
+    
   }
 }
 

@@ -5289,3 +5289,12 @@ div.overlay {
     border-radius: 3px;
     margin-bottom: 20px;
 }
+
+.dtr-title {
+  /* float: left; */
+}
+
+.data-dtr-index::after {
+  content: "";
+  clear: both;
+}

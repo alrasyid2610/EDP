@@ -29,12 +29,14 @@
                 </div>
             </td>
             <td>{{ $value->created_at }}</td>
-            <td>
-                <a class="btn btn-sm btn-primary text-white" href="{{ route('computers.show', ['computer' => $value->id]) }}"><i class="fa fa-eye"></i> </a>
-                <form action="{{ route('computers.edit', ['computer' => $value->id]) }}" class="d-inline">
-                    {{-- @csrf --}}
-                    <button class="btn btn-sm btn-success"><i class="fa fa-pencil"></i></button>
-                </form>
+            <td class="action-td" style="width: 10%">
+                <a class="btn btn-sm btn-primary text-white d-inline" style="float: left" href="{{ route('computers.show', ['computer' => $value->id]) }}"><i class="fa fa-eye"></i> </a>
+                {{-- <form action="{{ route('computers.edit', ['computer' => $value->id]) }}" class="d-inline" style="float: left">
+                    <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                </form> --}}
+                <x-com-btn-trigger-modal-delete :dataId="$value->id" :route="'computers'"></x-com-btn-trigger-modal-delete>
+
+                <div style="clear: both"></div>
             </td>
         </tr>
     @endforeach

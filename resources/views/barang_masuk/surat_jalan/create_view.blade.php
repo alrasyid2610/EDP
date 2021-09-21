@@ -1,29 +1,29 @@
 @extends('layouts.main')
 @section('content')
 
-<x-com-modaldelete></x-com-modaldelete>
-<x-com-modalpesan></x-com-modalpesan>
+    <x-com-modaldelete></x-com-modaldelete>
+    <x-com-modalpesan></x-com-modalpesan>
 
-@if(Session::has('message'))
-  <div class="modal" tabindex="-1" role="dialog" id="modalPesanEdit" data-show='true'>
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Message</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+    @if (Session::has('message'))
+        <div class="modal" tabindex="-1" role="dialog" id="modalPesanEdit" data-show='true'>
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Message</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ Session::get('message') }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          <p>{{ Session::get('message') }}</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-@endif
+    @endif
 
     <div class="row">
         <x-breadcrumb></x-breadcrumb>
@@ -31,6 +31,7 @@
             <div class="x_panel">
                 <div class="x_title">
                     <h2> <small>Data surat jalan yang belum lengkap</small></h2>
+
                     <ul class="nav navbar-right panel_toolbox">
                         <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                         </li>
@@ -95,7 +96,7 @@
                                             <a href="{{ route('technical_documents.create2', ['id_surat_jalan' => $item->id]) }}" class="btn btn-primary btn-sm">Lengkapi Surat Jalan</a>
                                             <a name="" id="" class="btn btn-info btn-sm" href="{{ route('shipping_documents.edit', ['shipping_document' => $item->id]) }}" role="button">Edit</a>
 
-                                            
+
                                             {{-- <form action="" class="d-inline" method="POST">
                                                 @method('DELETE')
                                                 @csrf
@@ -108,7 +109,7 @@
                                                   type="hidden" value="{{ $item->id }}" name="id_surat_jalan">
                                                 <button class="btn btn-primary btn-sm" type="submit">Lengkapi Surat Jalan</button>
                                               </form> --}}
-                                            <x-com-btn-trigger-modal-delete :dataId="$item->id" :route="$route = 'shipping_documents'" ></x-com-btn-trigger-modal-delete>
+                                            <x-com-btn-trigger-modal-delete :dataId="$item->id" :route="'shipping_documents'"></x-com-btn-trigger-modal-delete>
                                         </td>
                                     </tr>
                                     <?php $no++; ?>
@@ -124,9 +125,9 @@
 
 
 @section('script')
-   <script>
-    $('document').ready(function() { 
-      $('#modalPesanEdit').modal('show') 
-    });
-   </script>
+    <script>
+        $('document').ready(function() {
+            $('#modalPesanEdit').modal('show')
+        });
+    </script>
 @endsection
