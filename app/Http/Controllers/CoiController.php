@@ -106,7 +106,7 @@ class CoiController extends Controller
         $TFinalInspection0 = TFinalInspection0::where([
             ['COFCode', '=', $COFCode],
             ['CFINo', '=', $CFINo],
-            ['DUpdDate', '<', '2012'],
+            ['DUpdDate', '<', '2013'],
             ['DUpdDate', '>=', '2011']
         ])
             ->update(
@@ -118,7 +118,7 @@ class CoiController extends Controller
         $TFinalInspection1 = TFinalInspection1::where([
             ['COFCode', '=', $COFCode],
             ['CFINo', '=', $CFINo],
-            ['DUpdDate', '<', '2012'],
+            ['DUpdDate', '<', '2013'],
             ['DUpdDate', '>=', '2011']
         ])
             ->update(
@@ -130,7 +130,7 @@ class CoiController extends Controller
         $TFinalInspection2 = TFinalInspection2::where([
             ['COFCode', '=', $COFCode],
             ['CFINo', '=', $CFINo],
-            ['DUpdDate', '<', '2012'],
+            ['DUpdDate', '<', '2013'],
             ['DUpdDate', '>=', '2011']
         ])
             ->update(
@@ -142,7 +142,7 @@ class CoiController extends Controller
         $TFinalInspection3 = TFinalInspection3::where([
             ['COFCode', '=', $COFCode],
             ['CFINo', '=', $CFINo],
-            ['DUpdDate', '<', '2012'],
+            ['DUpdDate', '<', '2013'],
             ['DUpdDate', '>=', '2011']
         ])
             ->update(
@@ -154,7 +154,7 @@ class CoiController extends Controller
         $TFinalInspection4 = TFinalInspection4::where([
             ['COFCode', '=', $COFCode],
             ['CFINo', '=', $CFINo],
-            ['DUpdDate', '<', '2012'],
+            ['DUpdDate', '<', '2013'],
             ['DUpdDate', '>=', '2011']
         ])
             ->update(
@@ -166,7 +166,7 @@ class CoiController extends Controller
         $TFinalInspection5 = TFinalInspection5::where([
             ['COFCode', '=', $COFCode],
             ['CFINo', '=', $CFINo],
-            ['DUpdDate', '<', '2012'],
+            ['DUpdDate', '<', '2013'],
             ['DUpdDate', '>=', '2011']
         ])
             ->update(
@@ -178,7 +178,7 @@ class CoiController extends Controller
         $TCOIA0 = TCOIA0::where([
             ['COFCode', '=', $COFCode],
             ['CFINo', '=', $CFINo],
-            ['DUpdDate', '<', '2012'],
+            ['DUpdDate', '<', '2013'],
             ['DUpdDate', '>=', '2011']
         ])
             ->update(
@@ -190,7 +190,7 @@ class CoiController extends Controller
         $TCOIA1 = TCOIA1::where([
             ['COFCode', '=', $COFCode],
             ['CFINo', '=', $CFINo],
-            ['DUpdDate', '<', '2012'],
+            ['DUpdDate', '<', '2013'],
             ['DUpdDate', '>=', '2011']
         ])
             ->update(
@@ -202,7 +202,7 @@ class CoiController extends Controller
         $TCOIA2 = TCOIA2::where([
             ['COFCode', '=', $COFCode],
             ['CFINo', '=', $CFINo],
-            ['DUpdDate', '<', '2012'],
+            ['DUpdDate', '<', '2013'],
             ['DUpdDate', '>=', '2011']
         ])
             ->update(

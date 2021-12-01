@@ -192,9 +192,9 @@ Route::get('/v1/api/laptop_device', [LaptopsController::class, 'get_laptop_devic
 Route::resource('/coi', CoiController::class);
 Route::post('/coi_action', [CoiController::class, 'update2'])->name('coi_action');
 Route::get('/coi_check/{CFINo}/{COFCode}', [CoiController::class, 'coiCheck']);
-
+        
 
 Route::get('/get_data_cok/{id?}', function ($id = 's') {
-    $data = Computer::find($id)->toJSON();
+    $data = Computer::find($id)->toJSON(); 
     return $data;
 })->name('get_data');
