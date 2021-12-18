@@ -40,7 +40,8 @@ class ComputersController extends Controller
     public function create()
     {
         $dataSection = Section::all('section_name');
-        return view('computers.create', ['page_action' => 'Input', 'page_name' => 'Computer', 'dataSection' => $dataSection]);
+        $data_section = SectionController::get_data_section();
+        return view('computers.create', ['page_action' => 'Input', 'page_name' => 'Computer', 'data_section' => $data_section]);
     }
 
     /**
@@ -82,7 +83,7 @@ class ComputersController extends Controller
                 'ram' => $request->ram,
                 'hdd' => $request->hdd,
                 'ip' => $request->ip,
-                'internet' => $request->Internet,
+                'internet' => $request->internet,
                 'nsi' => $request->nsi,
                 'boss' => $request->boss,
                 'ms_office' => $request->ms_office,
@@ -94,7 +95,7 @@ class ComputersController extends Controller
                 'schedule_ppc' => $request->schedule_ppc,
                 'location' => $request->location,
                 'computer_operation' => $request->computer_operation,
-                'computer_description' => $request->computer_description,
+                'computer_description' => $request->computer_description == '' ? '-' : $request->computer_description,
                 'fa_computer' => $request->fa_computer,
                 'computer_date' => $request->computer_date,
                 'com_edp_number' => $request->com_edp_number,
@@ -155,7 +156,7 @@ class ComputersController extends Controller
         ];
         ComputerOperation::create($arrComputerOperation);
 
-        return redirect()->back()->withInput();
+        return redirect()->back()->with(['message' => 'Data berhasil di tambahkan']);
     }
 
     /**
@@ -172,13 +173,14 @@ class ComputersController extends Controller
 
         $flag = $request->flag;
 
-        if ($flag == 'computer_incomplete') {
+        if (isset($flag)) {
+            if ($flag == 'computer_incomplete') {
             $computer = $computer;
-
-            // dd(FixAsset::find($computer->fix_asset_id)->computer);
-            return view('computers.show_incomplete', ['page_action' => 'Show', 'page_name' => 'Computer', 'data' => $computer]);
+                return view('computers.show_incomplete', ['page_action' => 'Show', 'page_name' => 'Computer', 'data' => $computer]);
+            } else if ($flag != "computer_incomplete") {
+                return redirect()->route('computers.index');
+            } 
         } else {
-
             $data = ComputerOperation::find($id);
             // $data = DB::table('computer_operations as CO')
             //     ->select('CU.*', 'C.*', 'M.*', 'CO.id as co_id')
@@ -203,20 +205,28 @@ class ComputersController extends Controller
         // dd($id);
 
         if ($request->flag == 'computer_incomplete') {
-            dd('safsafasf');
+            $computer_incomplete = Computer::find($id);
+            $dataSection = SectionController::get_data_section();
+
+            return view('computers.create_incomplete', ['page_action' => 'Edit', 'page_name' => 'Computer', 'data_section' => $dataSection]);
+
+
+        } else if ($request->flag != 'computer_incomplete') {
+            return redirect()->route('computers.index');
         } else {
-
-
+            
             $computer = ComputerOperation::find($id);
 
             $monitor_id = $computer->monitor_id;
             $computer_user_id = $computer->computer_user_id;
             $computer_id = $computer->computer_id;
-            $dataSection = Section::all('section_name');
+            $dataSection = SectionController::get_data_section();
 
             
             // dd($data);
             // dd($computer->monitor_id);
+
+            
 
             return view('computers.edit', ['page_action' => 'Edit', 'page_name' => 'Computer', 'data' => $computer, 'dataSection' => $dataSection]);
         }
@@ -302,6 +312,7 @@ class ComputersController extends Controller
 
             array_push($arr, $datalengkappersen);
         }
+        // dd($data);
 
         $returnHTML = view('computers.tableData')->with(['data' => $data2, 'data_persen' => $arr])->render();
 

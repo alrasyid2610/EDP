@@ -198,3 +198,11 @@ Route::get('/get_data_cok/{id?}', function ($id = 's') {
     $data = Computer::find($id)->toJSON(); 
     return $data;
 })->name('get_data');
+
+
+
+Route::get('/check_pc_name/{pc_name?}', function ($pc_name = '') {
+    $data = Computer::where('pc_name', $pc_name)->get()->count();
+
+    return $data;
+});

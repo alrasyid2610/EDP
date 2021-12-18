@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Imports\ImportSectionData;
+use App\Models\Section;
 use Maatwebsite\Excel\Facades\Excel;
 
 class SectionController extends Controller
@@ -32,5 +33,13 @@ class SectionController extends Controller
         
         // alihkan halaman kembali
         return redirect('/import/section');
+    }
+
+     static function get_data_section()
+    {
+        $krw = Section::where('section_location', '=', 'Krawang')->get();
+        $plg = Section::where('section_location', '=', 'Pulogadung')->get();
+        $data_section = ['data_section_krw' => $krw, 'data_section_plg' => $plg];
+        return $data_section;
     }
 }

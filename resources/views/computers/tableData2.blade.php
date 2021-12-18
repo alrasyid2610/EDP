@@ -31,10 +31,10 @@
             <td>{{ $value->created_at }}</td>
             <td>
                 <a class="btn btn-sm btn-primary text-white" href="{{ route('computers.show', ['computer' => $value->id]) }}?flag=computer_incomplete">View Data</a>
-                <form action="{{ route('computers.edit', ['computer' => $value->id]) }}" class="d-inline">
-                    {{-- @csrf --}}
+                <a class="btn btn-sm btn-success btn-light px-2" href="{{ route('computers.edit', $value->id) }}?flag=computer_incomplete"><i class="fa fa-pencil text-white"></i></a>
+                {{-- <form action="{{ route('computers.edit', ['computer' => $value->id]) }}" class="d-inline">
                     <button class="btn btn-sm btn-success">Edit</button>
-                </form>
+                </form> --}}
             </td>
         </tr>
     @endforeach

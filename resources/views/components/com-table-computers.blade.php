@@ -161,19 +161,30 @@ if (empty($dataComputer)) {
 
                             <div class="col-lg-6 mb-3">
                                 <div class="form-group">
-                                    <label for="section">Section</label>
-                                    <select class="form-control" name="section" id="section">
-                                        @php
-                                            if ($kosong) {
-                                                loopSelectData($dataSection, '', 'section');
-                                            } else {
-                                                loopSelectData($dataSection, $dataComputer->get_user->section, 'section');
-                                            }
-                                        @endphp
+                                    <label for="no_bon">Choese Section</label>
+                                    <select class="form-control read-only" id="section"
+                                        name="section">
+                                        <option value="">-- Choese --</option>
+                                        @if(isset($dataSection))
+                                        <optgroup label="Pulogadung">
+                                            @foreach ( $dataSection['data_section_plg'] as $value)
+                                                    <option value="{{ $value->section_name }} | {{ $value->section_name_as }} | Pulogadung" {{ old('departement') == "$value->section_name" . ' | ' . "$value->section_name_as" ? 'selected' : '' }}>{{ $value->section_name }}</option>
+                                            @endforeach
+                                        </optgroup>
+                                        <optgroup label="Krawang">
+                                            @foreach ( $dataSection['data_section_krw'] as $value)
+                                            <option value="{{ $value->section_name }} | {{ $value->section_name_as }} | Krawang" {{ old('departement') == "$value->section_name" . ' | ' . "$value->section_name_as" ? 'selected' : '' }}>{{ $value->section_name }}</option>
+                                            @endforeach
+                                        </optgroup>
+                                        @else
+                                            <option value="{{ old('section') }}" selected>{{ old('section') }}</option>
+                                        @endif
                                     </select>
                                 </div>
                             </div>
 
+                    {{-- <h2>{{ old('departement', '') }}</h2> --}}
+                     
                             <div class="col-lg-6 mb-3">
                                 <label for="position">Position</label>
                                 <input type="position" class="form-control" id="position" placeholder="Position" name="position" value="{{ $dataComputer->get_user->position ?? '' }}">
@@ -186,6 +197,8 @@ if (empty($dataComputer)) {
                             <div class="col-lg-8 mb-3">
                                 <label for="pc_name">PC Name</label>
                                 <input type="text" class="form-control" id="pc_name" placeholder="PC Name" name="pc_name" required="" value="{{ $dataComputer->get_computer->pc_name ?? '' }}">
+                                <small class=""></small>
+                                
                                 @if ($errors->has('pc_name'))
                                     <span class="text-danger">{{ $errors->first('pc_name') }}</span>
                                 @endif
@@ -290,15 +303,19 @@ if (empty($dataComputer)) {
                             <div class="col-lg-12 mb-3">
                                 <label for="computer_description">Computer Description</label>
                                 <textarea name="computer_description" class="form-control" id="" cols="30" rows="3">{{ $dataComputer->get_computer->computer_description ?? '' }}</textarea>
+                                <small class="text-warning">Boleh Kosong</small>
                                 @if ($errors->has('computer_description'))
                                     <span class="text-danger">{{ $errors->first('computer_description') }}</span>
                                 @endif
                             </div>
 
-                            <h2>Fix Asset Komputer</h2>
+                            <div class="col-lg-12">
+                                <h2>Fix Asset Komputer</h2>
+                            </div>
                             <div class="col-lg-6 mb-3">
                                 <label for="fa_computer">Nomor Fix Asset</label>
-                                <input type="text" class="form-control" id="fa_computer" placeholder="Nomor Fix Asset Komputer" name="fa_computer" required="" value="{{ $dataComputer->get_computer->fix_asset->fixed_asset_number ?? '' }}">
+                                <input type="text" class="form-control" id="fa_computer" placeholder="Nomor Fix Asset Komputer" name="fa_computer"  value="{{ $dataComputer->get_computer->fix_asset->fixed_asset_number ?? '' }}">
+                                <small class="text-warning">Boleh Kosong</small>
                                 @if ($errors->has('fa_computer'))
                                     <span class="text-danger">{{ $errors->first('fa_computer') }}</span>
                                 @endif
@@ -306,7 +323,8 @@ if (empty($dataComputer)) {
 
                             <div class="col-lg-6 mb-3">
                                 <label for="com_edp_number">EDP No</label>
-                                <input type="text" class="form-control" id="com_edp_number" placeholder="EDP No" name="com_edp_number" required="" value="{{ $dataComputer->get_computer->fix_asset->edp_fixed_asset_number ?? '' }}">
+                                <input type="text" class="form-control" id="com_edp_number" placeholder="EDP No" name="com_edp_number"  value="{{ $dataComputer->get_computer->fix_asset->edp_fixed_asset_number ?? '' }}">
+                                <small class="text-warning">Boleh Kosong</small>
                                 @if ($errors->has('com_edp_number'))
                                     <span class="text-danger">{{ $errors->first('com_edp_number') }}</span>
                                 @endif
@@ -314,7 +332,8 @@ if (empty($dataComputer)) {
 
                             <div class="col-md-12 mb-3">
                                 <label for="computer_date">Tanggal Fix Asset</label>
-                                <input type="date" class="form-control" id="computer_date" placeholder="Tanggal Fix Asset" name="computer_date" required="" value="{{ $dataComputer->get_computer->fix_asset->fixed_asset_date ?? '' }}">
+                                <input type="date" class="form-control" id="computer_date" placeholder="Tanggal Fix Asset" name="computer_date"  value="{{ $dataComputer->get_computer->fix_asset->fixed_asset_date ?? '' }}">
+                                <small class="text-warning">Boleh Kosong</small>
                             </div>
                         </div>
                         <div id="step-3" class="tab-pane" role="tabpanel">
@@ -496,10 +515,11 @@ if (empty($dataComputer)) {
                                 </select>
                             </div>
 
-                            <h2>Fix Asset Komputer</h2>
+                            <h2>Fix Asset Monitor</h2>
                             <div class="col-lg-6 mb-3">
                                 <label for="fa_monitor">Nomor Fix Monitor</label>
-                                <input type="text" class="form-control" id="fa_monitor" placeholder="Nomor Fix Asset Komputer" name="fa_monitor" required="" value="{{ $dataComputer->get_monitor->fix_asset->fixed_asset_number ?? '' }}">
+                                <input type="text" class="form-control" id="fa_monitor" placeholder="Nomor Fix Asset Komputer" name="fa_monitor"  value="{{ $dataComputer->get_monitor->fix_asset->fixed_asset_number ?? '' }}">
+                                <small class="text-warning">Boleh Kosong</small>
                                 @if ($errors->has('fa_monitor'))
                                     <span class="text-danger">{{ $errors->first('fa_monitor') }}</span>
                                 @endif
@@ -507,7 +527,8 @@ if (empty($dataComputer)) {
 
                             <div class="col-lg-6 mb-3">
                                 <label for="edp_monitor_number">EDP No</label>
-                                <input type="text" class="form-control" id="edp_monitor_number" placeholder="EDP No" name="edp_monitor_number" required="" value="{{ $dataComputer->get_monitor->fix_asset->edp_fixed_asset_number ?? '' }}">
+                                <input type="text" class="form-control" id="edp_monitor_number" placeholder="EDP No" name="edp_monitor_number" value="{{ $dataComputer->get_monitor->fix_asset->edp_fixed_asset_number ?? '' }}">
+                                <small class="text-warning">Boleh Kosong</small>
                                 @if ($errors->has('edp_monitor_number'))
                                     <span class="text-danger">{{ $errors->first('edp_monitor_number') }}</span>
                                 @endif
@@ -515,7 +536,8 @@ if (empty($dataComputer)) {
 
                             <div class="col-md-12 mb-3">
                                 <label for="monitor_date">Tanggal Fix Asset</label>
-                                <input type="date" class="form-control" id="monitor_date" placeholder="Tanggal Fix Asset" name="monitor_date" required="" value="{{ $dataComputer->get_monitor->fix_asset->fixed_asset_date ?? '' }}">
+                                <input type="date" class="form-control" id="monitor_date" placeholder="Tanggal Fix Asset" name="monitor_date" value="{{ $dataComputer->get_monitor->fix_asset->fixed_asset_date ?? '' }}">
+                                <small class="text-warning">Boleh Kosong</small>
                             </div>
 
                             <input type="submit" class="btn btn-primary" value="Submit">
